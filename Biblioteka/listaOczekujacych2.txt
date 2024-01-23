@@ -1,20 +1,5 @@
-3
+2
 Patrick
 Bateman
 44433
-
-23
-Sung
-Jin
-423111
-
-0
-Kacper
-Olszewski
-501302
-
-8
-Czytelnik
-Czytelnicki
-997
 

@@ -76,7 +76,7 @@ public:
 	void powiadomDostepnosc() {}
 	void usunZListy(int idx) {
 		vector<DaneKlienta>::iterator it;
-
+		it = listaOczekujacych.begin() + idx;
 		listaOczekujacych.erase(it);
 	}
 	void zmienDostepnosc() {}
@@ -148,7 +148,7 @@ public:
 	void wypiszKsiazki() {
 		Ksiazka book;
 		for (auto& book : books) {
-			cout << "Nazwa ksiazki: " << book.nazwa << endl;
+			cout << endl<< "Nazwa ksiazki: " << book.nazwa << endl;
 			cout << "Czy jest dostepna: " << book.dostepnosc << endl << endl;
 			if (book.dostepnosc == "nie") {
 				book.wypiszListe();
@@ -157,12 +157,8 @@ public:
 
 	}
 	
-	/*void usun(int idx) {
-	listaKlientow.erase(idx);
-	}*/
+	
 
-	~Biblioteka() {
-	}
 	int get_liczbaKlientow() {
 		return liczbaKlientow;
 	}
@@ -175,7 +171,7 @@ public:
 	}
 	void updateFile() {
 
-		static const char* const file = "clients.txt";
+		static const char* const file = "Clients.txt";
 		ofstream fout;
 		fout.open(file);
 		if (!fout) {
@@ -188,6 +184,18 @@ public:
 			fout << liczba << endl << Client.imie << endl << Client.nazwisko << endl << Client.nr_tel << endl<<endl;
 			++liczba;
 		}
+
+		static const char* const file2 = "Books.txt";
+		ofstream fout2;
+		fout2.open(file2);
+		if (!fout2) {
+			cerr << "Error in opening the file" << endl;
+		}
+		Ksiazka book;
+		for (const auto& book : books) {
+			fout2 << book.dostepnosc << endl << book.nazwa << endl << book.file << endl << endl;
+		}
+
 	}
 
 	void noweZgloszenie() {
@@ -228,6 +236,9 @@ public:
 		string plik;
 		plik = books[index_ksiazki].file;
 		books[index_ksiazki].updateLista(plik);
+		if (books[index_ksiazki].dostepnosc == "tak") {
+			books[index_ksiazki].dostepnosc = "nie";
+		}
 	}
 	void oddajKsiazke(int idx) {
 		DaneKlienta Klient = listaKlientow[idx];
@@ -242,6 +253,27 @@ public:
 					book.wypiszListe();
 					if (index != 0) {
 						book.usunZListy(index);
+						book.updateLista(book.file);
+						cout << endl<< "Osoba usunieta z listy oczekujacych byla w kolejce numerem: " << (index+1) <<endl;
+						if (book.listaOczekujacych.size() == 1) {
+							cout << "Powiadom 1 osobe w kolejce ze ksiazka jest dostepna dla niego";
+						}
+						book.updateLista(book.file);
+						
+					}
+					else if (index == 0) {
+						book.usunZListy(index);
+						if (book.listaOczekujacych.empty()) {
+							book.dostepnosc = "tak";
+							cout << book.nazwa << " jest dostepna do wypozyczenia" << endl;
+							book.updateLista(book.file);
+							
+						}
+						else {
+							cout << "Powiadom 2 osobe w kolejce ze ksiazka jest dostepna dla niego";
+							book.updateLista(book.file);
+							
+						}
 					}
 	
 				}
@@ -270,6 +302,8 @@ int main() {
 		int idx;
 		string ksiazka_wybor;
 		switch (wybor) {
+
+
 		case 1: //dodannie klienta do Biblioteki 
 			biblioteka.noweZgloszenie();
 			system("CLS");
@@ -277,12 +311,16 @@ int main() {
 			_getch();
 			biblioteka.updateFile();
 			break;
+
+
 		case 2: //wypisanie dostepnosci ksiazek
 			system("CLS");
 			biblioteka.wypiszDostepnosc();
 			cout << endl << endl;
 			_getch();
 			break;
+
+
 		case 3:
 		system("CLS");
 		cout << "Wybierz klienta dla ktorego chcesz dodac do listy ksiazki: " << endl;
@@ -299,8 +337,11 @@ int main() {
 		system("CLS");
 		cout << "Dodano klienta do listy oczekujacych dla ksiazki: " <<ksiazka_wybor<<endl;
 		biblioteka.wypiszKlienta(idx);
+		biblioteka.updateFile();
 		_getch();
 		break;
+
+
 		case 4:
 			system("CLS");
 			biblioteka.wypiszKlientow();
@@ -310,15 +351,18 @@ int main() {
 			cout << "Klient nr: " << idx;
 			biblioteka.wypiszKlienta(idx);
 			biblioteka.oddajKsiazke(idx);
+			biblioteka.updateFile();
 			_getch();
-		//	system("CLS");
-		//	break;
-		//case 0:
-		//	cout << "Zakonczono program." << endl;
-		//	break;
-		//default:
-		//	cout << "Nieprawidlowa opcja. Sprobuj ponownie." << endl;
-		//	_getch();
+			system("CLS");
+			break;
+
+		case 0:
+			cout << "Zakonczono program." << endl;
+			break;
+
+		default:
+			cout << "Nieprawidlowa opcja. Sprobuj ponownie." << endl;
+			_getch();
 
 		}
 
@@ -331,163 +375,3 @@ int main() {
 
 
 
-
-// struct serwis_info {
-	// string naprawa;
-	// string przeglad;
-	// int nr;
-	//};
-	//
-	//class serwis {
-	// vector<serwis_info> Lista;
-	// int idx;
-	//public:
-	//
-	// serwis(Warsztat* workship) {
-	// idx = workship->get_liczbaKlientow();
-	// ifstream plik("serwis.txt");
-	// if (!plik)
-	// {
-	// cerr << "Error in opening the output file" << endl;
-	// }
-	//
-	// if (empty(plik)) //plik serwis pusty
-	// {
-	// for (int i = 0; i < idx; ++i) {
-	// serwis_info Client;
-	// Client.nr = i;
-	// Client.naprawa = "nie";
-	// Client.przeglad = "nie";
-	// Lista.push_back(Client);
-	// }
-	// DaneKlienta Client;
-	// static const char* const file = "serwis.txt";
-	// ofstream fout;
-	// for (const auto& Client : Lista) {
-	// fout << Client.nr << endl << Client.naprawa << endl << Client.przeglad << endl;
-	// }
-	// }
-	// serwis_info Client;
-	// while (plik >> Client.nr >> Client.naprawa >> Client.przeglad) {
-	// Lista.push_back(Client);
-	// }
-	// }
-	//
-	//
-	// void dodaj() {
-	// serwis_info Client;
-	// Client.nr = idx;
-	// Client.naprawa = "nie";
-	// Client.przeglad = "nie";
-	// Lista.push_back(Client);
-	// idx++;
-	//
-	// }
-	// void update() {
-	// static const char* const file = "serwis.txt";
-	// ofstream fout;
-	// fout.open(file);
-	// if (!fout) {
-	// cerr << "Error in opening the output file" << endl;
-	// }
-	//
-	// DaneKlienta Client;
-	// for (const auto& Client : Lista) {
-	// fout << Client.nr << endl << Client.naprawa << endl << Client.przeglad << endl << endl;
-	// }
-	// }
-	// serwis_info getSerwis(int idx) {
-	// serwis_info Client = Lista[idx];
-	// return Client;
-	// }
-	//
-	// void wypiszSerwis(int idx) {
-	// cout << "Naprawa: " << Lista[idx].naprawa << endl;
-	// cout << "Przeglad: " << Lista[idx].przeglad << endl;
-	// }
-	//
-	// void aktualizacjaSerwisu(int idx, int co) {
-	// if (co == 1) {
-	// cout << "\nWybrano naprawe ";
-	// Lista[idx].naprawa = "tak";
-	//
-	// }
-	// else if (co == 2) {
-	// cout << "\nWybrano przeglad ";
-	// Lista[idx].przeglad = "tak";
-	// }
-	// else if (co == 3) {
-	// cout << "\nWybrano przeglad i naprawe ";
-	// Lista[idx].naprawa = "tak";
-	// Lista[idx].przeglad = "tak";
-	// }
-	// }
-	//};
-	//
-	//
-	//class Faktury {
-	//private:
-	// DaneKlienta Client;
-	// serwis_info cena;
-	// int cost;
-	//public:
-	// Faktury(DaneKlienta Dane, serwis_info Serwis) {
-	// Client.imie = Dane.imie;
-	// Client.nazwisko = Dane.nazwisko;
-	// Client.nr_tel = Dane.nr_tel;
-	// Client.nr = Dane.nr;
-	// Client.samochod.rejestracja = Dane.samochod.rejestracja;
-	// cena.naprawa = Serwis.naprawa;
-	// cena.nr = Serwis.nr;
-	// cena.przeglad = Serwis.przeglad;
-	// cost = 0;
-	// }
-	// void wystawienieFaktury() {
-	// if (cena.naprawa == "tak" && cena.przeglad == "nie") {
-	// cout << endl << "Wystawiono fakture za naprawe cena : 500zl ";
-	// cout << endl << "NR: " << Client.nr;
-	// cout << endl << Client.imie << ' ' << Client.nazwisko;
-	// cout << endl << "Nr telefonu: " << Client.nr_tel;
-	// cout << endl << "Rejestracja: " << Client.samochod.rejestracja;
-	// cout << endl << "Czy byla naprawa" << cena.naprawa;
-	// cost = 500;
-	// }
-	// if (cena.naprawa == "nie" && cena.przeglad == "tak") {
-	// cout << endl << "Wystawiono fakture za naprawe przeglad : 200zl ";
-	// cout << endl << "NR: " << Client.nr;
-	// cout << endl << Client.imie << ' ' << Client.nazwisko;
-	// cout << endl << "Nr telefonu: " << Client.nr_tel;
-	// cout << endl << "Rejestracja: " << Client.samochod.rejestracja;
-	// cout << endl << "Czy byla przeglad" << cena.przeglad;
-	// cost = 200;
-	// }
-	// if (cena.naprawa == "tak" && cena.przeglad == "tak") {
-	// cout << endl << "Wystawiono fakture za naprawe i przeglad cena : 700zl ";
-	// cout << endl << "NR: " << Client.nr;
-	// cout << endl << Client.imie << ' ' << Client.nazwisko;
-	// cout << endl << "Nr telefonu: " << Client.nr_tel;
-	// cout << endl << "Rejestracja: " << Client.samochod.rejestracja;
-	// cout << endl << "Czy byla naprawa: " << cena.naprawa;
-	// cout << endl << "Czy byla przeglad: " << cena.przeglad;
-	// cost = 700;
-	// }
-	// if (cena.naprawa == "nie" && cena.przeglad == "nie") {
-	// cout << "Nie da sie wystawic faktury\n";
-	// }
-	// }
-	// void zapisanie() {
-	// ofstream fout;
-	// fout.open("faktury.txt", std::ios_base::app); // append instead of overwrite
-	// if (!fout) {
-	// cerr << "Error in opening the output file" << endl;
-	// }
-	//
-	// fout << endl << "Wystawiono fakture za naprawe i przeglad cena: " << cost;
-	// fout << endl << "NR: " << Client.nr;
-	// fout << endl << Client.imie << ' ' << Client.nazwisko;
-	// fout << endl << "Nr telefonu: " << Client.nr_tel;
-	// fout << endl << "Rejestracja: " << Client.samochod.rejestracja;
-	// fout << endl << "Czy byla naprawa: " << cena.naprawa;
-	// fout << endl << "Czy byla przeglad: " << cena.przeglad << endl << endl;
-	// }
-	//};
