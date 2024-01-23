@@ -73,8 +73,12 @@ public:
 	void nowyDoListy(DaneKlienta dane) {
 		listaOczekujacych.push_back(dane);
 	}
-	void wypiszNazwe() {}
 	void powiadomDostepnosc() {}
+	void usunZListy(int idx) {
+		vector<DaneKlienta>::iterator it;
+
+		listaOczekujacych.erase(it);
+	}
 	void zmienDostepnosc() {}
 	void updateLista(const string file) {
 		ofstream fout;
@@ -225,6 +229,26 @@ public:
 		plik = books[index_ksiazki].file;
 		books[index_ksiazki].updateLista(plik);
 	}
+	void oddajKsiazke(int idx) {
+		DaneKlienta Klient = listaKlientow[idx];
+		DaneKlienta Wliscie;
+		Ksiazka book;
+		int index=0;
+		for (auto& book : books) {
+			index = 0;
+			for (auto& Wliscie : book.listaOczekujacych) {
+				if (Wliscie.nr == Klient.nr) {
+					cout << endl;
+					book.wypiszListe();
+					if (index != 0) {
+						book.usunZListy(index);
+					}
+	
+				}
+				index++;
+			}
+		}
+	}
 
 };
 
@@ -277,10 +301,16 @@ int main() {
 		biblioteka.wypiszKlienta(idx);
 		_getch();
 		break;
-		//case 4:
-		//	system("CLS");
-		//	warsztat.wypiszKlientow();
-		//	_getch();
+		case 4:
+			system("CLS");
+			biblioteka.wypiszKlientow();
+			cout << endl << endl << "Wybierz klienta ktory ma oddac ksiazke: " << endl;
+			idx = getIndx();
+			system("CLS");
+			cout << "Klient nr: " << idx;
+			biblioteka.wypiszKlienta(idx);
+			biblioteka.oddajKsiazke(idx);
+			_getch();
 		//	system("CLS");
 		//	break;
 		//case 0:
