@@ -5,16 +5,6 @@
 #include <conio.h>
 using namespace std;
 
-bool empty(std::ifstream& pFile) {
-	return pFile.peek() == std::ifstream::traits_type::eof();
-}
-
-int CoZrobic() {
-	int co;
-	cout << endl << "Wybierz\n1 jesli naprawa\n2 Jesli Przeglad\n3 Jesli to i to: ";
-	cin >> co;
-	return co;
-}
 
 int getIndx() {
 	int nr;
@@ -37,23 +27,27 @@ struct DaneKlienta {
 	int nr_tel;
 };
 
+
+
+
+
 class Biblioteka;
 
 class Ksiazka {
 private:
 	string dostepnosc;
 	string nazwa;
-	 string file;
+	string file;
 	vector<DaneKlienta> listaOczekujacych;
 public:
 	Ksiazka() {
 	}
 	void wypiszListe() {
 		int i = 1;
-		cout << endl << "Lista Oczekujacych na ksiazke: "<<nazwa<<endl;
+		cout << endl << "Lista Oczekujacych na ksiazke: " << nazwa << endl;
 		DaneKlienta Client;
 		for (const auto& Client : listaOczekujacych) {
-			cout << endl << "Osoba " << i<<endl  << "Klient nr: " << Client.nr << endl << Client.imie << ' ' << Client.nazwisko << ' ' << Client.nr_tel << endl;
+			cout << endl << "Osoba " << i << endl << "Klient nr: " << Client.nr << endl << Client.imie << ' ' << Client.nazwisko << ' ' << Client.nr_tel << endl;
 			++i;
 		}
 
@@ -91,10 +85,16 @@ public:
 			fout << Client.nr << endl << Client.imie << endl << Client.nazwisko << endl << Client.nr_tel << endl << endl;
 		}
 	}
-	
+
 
 	friend Biblioteka;
 };
+
+
+
+
+
+
 
 
 class Biblioteka {
@@ -104,7 +104,7 @@ private:
 	int liczbaKlientow;
 
 public:
-	
+
 	Biblioteka() : liczbaKlientow(0) {}
 	Biblioteka(const string file, const string file2) {
 		liczbaKlientow = 0;
@@ -140,7 +140,7 @@ public:
 		Ksiazka book;
 		for (const auto& book : books) {
 			cout << "Nazwa ksiazki: " << book.nazwa << endl;
-			cout << "Czy jest dostepna: " << book.dostepnosc << endl<<endl;
+			cout << "Czy jest dostepna: " << book.dostepnosc << endl << endl;
 
 		}
 	}
@@ -148,7 +148,7 @@ public:
 	void wypiszKsiazki() {
 		Ksiazka book;
 		for (auto& book : books) {
-			cout << endl<< "Nazwa ksiazki: " << book.nazwa << endl;
+			cout << endl << "Nazwa ksiazki: " << book.nazwa << endl;
 			cout << "Czy jest dostepna: " << book.dostepnosc << endl << endl;
 			if (book.dostepnosc == "nie") {
 				book.wypiszListe();
@@ -156,8 +156,8 @@ public:
 		}
 
 	}
-	
-	
+
+
 
 	int get_liczbaKlientow() {
 		return liczbaKlientow;
@@ -181,7 +181,7 @@ public:
 		DaneKlienta Client;
 		int liczba = 0;
 		for (const auto& Client : listaKlientow) {
-			fout << liczba << endl << Client.imie << endl << Client.nazwisko << endl << Client.nr_tel << endl<<endl;
+			fout << liczba << endl << Client.imie << endl << Client.nazwisko << endl << Client.nr_tel << endl << endl;
 			++liczba;
 		}
 
@@ -222,7 +222,7 @@ public:
 	}
 
 	void dodajDoListy(string ksiazka, int idx) {
-		int index_ksiazki=0;
+		int index_ksiazki = 0;
 		int i = 0;
 		Ksiazka book;
 		for (const auto& book : books) {
@@ -244,7 +244,7 @@ public:
 		DaneKlienta Klient = listaKlientow[idx];
 		DaneKlienta Wliscie;
 		Ksiazka book;
-		int index=0;
+		int index = 0;
 		for (auto& book : books) {
 			index = 0;
 			for (auto& Wliscie : book.listaOczekujacych) {
@@ -254,12 +254,12 @@ public:
 					if (index != 0) {
 						book.usunZListy(index);
 						book.updateLista(book.file);
-						cout << endl<< "Osoba usunieta z listy oczekujacych byla w kolejce numerem: " << (index+1) <<endl;
+						cout << endl << "Osoba usunieta z listy oczekujacych byla w kolejce numerem: " << (index + 1) << endl;
 						if (book.listaOczekujacych.size() == 1) {
 							cout << "Powiadom 1 osobe w kolejce ze ksiazka jest dostepna dla niego";
 						}
 						book.updateLista(book.file);
-						
+
 					}
 					else if (index == 0) {
 						book.usunZListy(index);
@@ -267,15 +267,15 @@ public:
 							book.dostepnosc = "tak";
 							cout << book.nazwa << " jest dostepna do wypozyczenia" << endl;
 							book.updateLista(book.file);
-							
+
 						}
 						else {
 							cout << "Powiadom 2 osobe w kolejce ze ksiazka jest dostepna dla niego";
 							book.updateLista(book.file);
-							
+
 						}
 					}
-	
+
 				}
 				index++;
 			}
@@ -322,24 +322,24 @@ int main() {
 
 
 		case 3:
-		system("CLS");
-		cout << "Wybierz klienta dla ktorego chcesz dodac do listy ksiazki: " << endl;
-		biblioteka.wypiszKlientow();
-		cout << endl << endl;
-		idx = getIndx();
-		system("CLS");
-		cout << "Klient nr: " << idx;
-		cout << endl << "Wybierz ksiazke do ktorej ma klient zostac dodany do listy oczekujacych" << endl;
-		biblioteka.wypiszKsiazki();
-		cout << endl << endl;
-		ksiazka_wybor = getString();
-		biblioteka.dodajDoListy(ksiazka_wybor, idx);
-		system("CLS");
-		cout << "Dodano klienta do listy oczekujacych dla ksiazki: " <<ksiazka_wybor<<endl;
-		biblioteka.wypiszKlienta(idx);
-		biblioteka.updateFile();
-		_getch();
-		break;
+			system("CLS");
+			cout << "Wybierz klienta dla ktorego chcesz dodac do listy ksiazki: " << endl;
+			biblioteka.wypiszKlientow();
+			cout << endl << endl;
+			idx = getIndx();
+			system("CLS");
+			cout << "Klient nr: " << idx;
+			cout << endl << "Wybierz ksiazke do ktorej ma klient zostac dodany do listy oczekujacych" << endl;
+			biblioteka.wypiszKsiazki();
+			cout << endl << endl;
+			ksiazka_wybor = getString();
+			biblioteka.dodajDoListy(ksiazka_wybor, idx);
+			system("CLS");
+			cout << "Dodano klienta do listy oczekujacych dla ksiazki: " << ksiazka_wybor << endl;
+			biblioteka.wypiszKlienta(idx);
+			biblioteka.updateFile();
+			_getch();
+			break;
 
 
 		case 4:
@@ -371,7 +371,3 @@ int main() {
 	system("pause");
 	return 0;
 }
-
-
-
-
